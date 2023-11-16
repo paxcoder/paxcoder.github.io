@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>eksplozja! wybuchowa zabawa dla wszystkich, tylko na wgp!</title>
+    <style>
+        .card {
+            width: 100px;
+            height: 150px;
+            border: 1px solid black;
+            margin: 10px;
+            text-align: center;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>eksplozja! wybuchowa zabawa dla wszystkich, tylko na wgp!</h1>
+    <button onclick="losujKartę()" aria-label="Losuj Kartę">Losuj Kartę</button>
+    <button onclick="dodajDoBanku()" aria-label="Dodaj do Banku">Dodaj do Banku</button>
+    <div id="wynik" aria-live="polite">Wynik: 0</div>
+    <div id="punktyDodaneDoBanku" aria-live="polite">Punkty Dodane do Banku: 0</div>
+    <div id="niezbankowanePunkty" aria-live="polite">Niezbankowane Punkty: 0</div>
+    <div id="komunikat" aria-live="assertive"></div>
+    <div id="karty" aria-live="polite"></div>
+
+    <script>
+        let wynik = 0;
+        let punktyDodaneDoBanku = 0;
+        let niezbankowanePunkty = 0;
+
+        function losujKartę() {
+            const karty = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'bomba', 'podwójnyPlus', 'łotr'];
+            const losowaKarta = karty[Math.floor(Math.random() * karty.length)];
+
+            if (losowaKarta === 'bomba') {
+                if (niezbankowanePunkty > 0) {
+                    niezbankowanePunkty = 0;
+                    showMessage('Bum! Straciłeś wszystkie niezbankowane punkty!');
+                } else if (punktyDodaneDoBanku >= 30) {
+                    punktyDodaneDoBanku -= 30;
+                    showMessage('Bum! Straciłeś 30 punktów dodanych do banku!');
+                } else {
+                    showMessage('Koniec Gry! Nie masz już punktów.');
+                }
+            } else if (losowaKarta === 'podwójnyPlus') {
+                niezbankowanePunkty *= 2;
+                showMessage('Podwójny Plus! Twoje niezbankowane punkty zostaną podwojone!');
+            } else if (losowaKarta === 'łotr') {
+                losujKartęŁotra();
+                return;
+            } else {
+                niezbankowanePunkty += parseInt(losowaKarta);
+                showMessage(`Wylosowałeś ${losowaKarta}`);
+            }
+
+            aktualizujPunkty();
+        }
+
+        function losujKartęŁotra() {
+            let wylosowaneKarty = [];
+            let tekstWylosowanychKart = '';
+            const karty = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'bomba', 'podwójnyPlus'];
+            for (let i = 0; i < 5; i++) {
+                const losowaKarta = karty[Math.floor(Math.random() * (karty.length - 3))]; 
+                niezbankowanePunkty += parseInt(losowaKarta);
+                wylosowaneKarty.push(losowaKarta);
+                tekstWylosowanychKart += ` ${losowaKarta}`;
+            }
+            niezbankowanePunkty *= 2;
+            aktualizujPunkty();
+            showMessage(`Wylosowałeś Łotra, a on wylosował:${tekstWylosowanychKart}`);
+            aktualizujKarty(wylosowaneKarty);
+        }
+
+        function dodajDoBanku() {
+            if (niezbankowanePunkty >= 30) {
+                const punktyDoDodaniaDoBanku = niezbankowanePunkty;
+                punktyDodaneDoBanku += punktyDoDodaniaDoBanku;
+                niezbankowanePunkty = 0;
+                aktualizujPunkty();
+                showMessage(`Dodano do banku ${punktyDoDodaniaDoBanku} punktów!`);
+            } else {
+                showMessage('Potrzebujesz co najmniej 30 niezbankowanych punktów, aby dodać do banku.');
+            }
+
+            if (punktyDodaneDoBanku >= 1000) {
+                showMessage('Gratulacje! Wygrałeś grę!');
+                setTimeout(function() {
+                    window.location.href = 'wygrana.html';
+                }, 2000);
+            }
+        }
+
+        function aktualizujPunkty() {
+            document.getElementById('wynik').innerText = `Wynik: ${wynik}`;
+            document.getElementById('punktyDodaneDoBanku').innerText = `Punkty Dodane do Banku: ${punktyDodaneDoBanku}`;
+            document.getElementById('niezbankowanePunkty').innerText = `Niezbankowane Punkty: ${niezbankowanePunkty}`;
+        }
+
+        function showMessage(message) {
+            const messageElement = document.getElementById('komunikat');
+            messageElement.innerText = message;
+            messageElement.setAttribute('aria-hidden', 'false');
+            messageElement.focus();
+
+            setTimeout(function() {
+                messageElement.setAttribute('aria-hidden', 'true');
+            }, 3000);
+        }
+
+        function aktualizujKarty(wylosowaneKarty) {
+            const cardsElement = document.getElementById('karty');
+            cardsElement.innerText = `Wylosowane Karty: ${wylosowaneKarty.join(", ")}`;
+        }
+    </script>
+</body>
+</html>

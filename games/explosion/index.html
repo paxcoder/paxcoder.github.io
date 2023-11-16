@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>explosion! blasting fun for everyone, on wgp only!</title>
+    <style>
+        .card {
+            width: 100px;
+            height: 150px;
+            border: 1px solid black;
+            margin: 10px;
+            text-align: center;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>explosion! blasting fun for everyone, on wgp only!</h1>
+    <button onclick="drawCard()" aria-label="Draw Card">Draw Card</button>
+    <button onclick="bankPoints()" aria-label="Bank Points">Bank Points</button>
+    <div id="score" aria-live="polite">Score: 0</div>
+    <div id="bankedPoints" aria-live="polite">Banked Points: 0</div>
+    <div id="unbankedPoints" aria-live="polite">Unbanked Points: 0</div>
+    <div id="message" aria-live="assertive"></div>
+    <div id="cards" aria-live="polite"></div>
+
+    <script>
+        let score = 0;
+        let bankedPoints = 0;
+        let unbankedPoints = 0;
+
+        function playBoomSound() {
+            let boomSound = new Audio('boom.wav');
+            boomSound.play();
+        }
+
+        function playDrawSound() {
+            let drawSound = new Audio('draw.mp3');
+            drawSound.play();
+        }
+
+        function drawCard() {
+<<<<<<< HEAD
+            const cards = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'doublePlus', 'rogue', 'bomb', 'ballOfRandomness', '-1', '-2', '-3', '-4', '-5', '-6', '-7', '-8', '-9'];
+=======
+            const cards = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'doublePlus', 'rogue', 'bomb'];
+>>>>>>> parent of 7b6779e (added a surprise card in, guess what is it?)
+            const randomCard = cards[Math.floor(Math.random() * cards.length)];
+
+            playDrawSound(); // Play draw sound
+
+            if (randomCard === 'doublePlus') {
+                // Handle doublePlus logic here
+            } else if (randomCard === 'rogue') {
+                drawRogueCard();
+                return;
+            } else if (randomCard === 'bomb') {
+                if (unbankedPoints > 0 || bankedPoints > 0) {
+                    showMessage("Explosion! You drew a bomb, so you lose all your points.");
+                    unbankedPoints = 0;
+                    bankedPoints = 0;
+                } else {
+                    showMessage('Explosion! You drew a bomb, and you have no points. You lose!');
+                    setTimeout(function() {
+                        window.location.href = 'loser.html'; // Redirect to loser.html
+                    }, 2000);
+                }
+                // Play bomb sound
+                playBoomSound();
+<<<<<<< HEAD
+            } else if (randomCard === 'ballOfRandomness') {
+                const drawnCards = [];
+                let bombCount = 0;
+
+                for (let i = 0; i < 5; i++) {
+                    let randomCard = '';
+                    do {
+                        randomCard = cards[Math.floor(Math.random() * cards.length)];
+                    } while (randomCard === 'ballOfRandomness'); // Prevent drawing itself
+
+                    drawnCards.push(randomCard);
+
+                    if (randomCard === 'bomb') {
+                        bombCount++;
+                    } else if (randomCard === 'rogue') {
+                        drawRogueCard();
+                    } else if (!isNaN(parseInt(randomCard))) {
+                        unbankedPoints -= parseInt(randomCard);
+                    }
+                }
+
+                let message = `You drew Ball of Randomness and it reversed the effects of 5 cards: ${drawnCards.join(", ")}`;
+
+                if (bombCount > 0) {
+                    unbankedPoints *= 2;
+                    message += ` | Doubled unbanked points due to bomb(s).`;
+                }
+
+                showMessage(message);
+
+                if (!isNaN(parseInt(randomCard))) {
+                    unbankedPoints += parseInt(randomCard);
+                    showMessage(`You drew a ${randomCard}`);
+                }
+            } else if (!isNaN(parseInt(randomCard))) {
+                unbankedPoints -= parseInt(randomCard); // Negative cards remove points
+=======
+            } else {
+                unbankedPoints += parseInt(randomCard);
+>>>>>>> parent of 7b6779e (added a surprise card in, guess what is it?)
+                showMessage(`You drew a ${randomCard}`);
+            } else if (randomCard.charAt(0) === '-') {
+                const value = parseInt(randomCard);
+                if (cards.includes('ballOfRandomness')) {
+                    unbankedPoints += value; // Add points if Ball of Randomness is in the deck
+                } else {
+                    unbankedPoints -= value; // Otherwise, negative cards remove points
+                }
+                showMessage(`You drew a ${value} card! Points ${value > 0 ? 'added' : 'removed'}.`);
+            }
+
+            updatePoints();
+        }
+
+        function drawRogueCard() {
+            let drawnCards = [];
+            let drawnCardsText = '';
+            const cards = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'doublePlus', 'bomb', '-1', '-2', '-3', '-4', '-5', '-6', '-7', '-8', '-9'];
+            for (let i = 0; i < 6; i++) { // Draw 6 cards for Rogue
+                const randomCard = cards[Math.floor(Math.random() * cards.length)];
+                const cardValue = parseInt(randomCard);
+                if (!isNaN(cardValue)) {
+                    unbankedPoints += cardValue;
+                    drawnCards.push(randomCard);
+                    drawnCardsText += ` ${randomCard}`;
+                }
+            }
+
+            if (!isNaN(unbankedPoints)) {
+                unbankedPoints *= 2;
+                updatePoints();
+                showMessage(`You drew Rogue, and it drew:${drawnCardsText}`);
+                updateCards(drawnCards);
+            }
+
+            // Play draw sound six times
+            for (let i = 0; i < 6; i++) {
+                playDrawSound();
+            }
+        }
+
+        function bankPoints() {
+            if (unbankedPoints >= 30) {
+                const pointsToBank = unbankedPoints;
+                bankedPoints += pointsToBank;
+                unbankedPoints = 0;
+                updatePoints();
+                showMessage(`You banked ${pointsToBank} points!`);
+                // Play draw sound
+                playDrawSound();
+            } else {
+                showMessage('You need at least 30 unbanked points to bank.');
+            }
+
+            if (bankedPoints >= 1000) {
+                showMessage('Congratulations! You won the game!');
+                setTimeout(function() {
+                    window.location.href = 'win.html';
+                }, 2000);
+            }
+        }
+
+        function updatePoints() {
+            document.getElementById('score').innerText = `Score: ${score}`;
+            document.getElementById('bankedPoints').innerText = `Banked Points: ${bankedPoints}`;
+            document.getElementById('unbankedPoints').innerText = `Unbanked Points: ${unbankedPoints}`;
+        }
+
+        function showMessage(message) {
+            const messageElement = document.getElementById('message');
+            messageElement.innerText = message;
+            messageElement.setAttribute('aria-hidden', 'false');
+            messageElement.focus();
+
+            setTimeout(function() {
+                messageElement.setAttribute('aria-hidden', 'true');
+            }, 3000);
+        }
+
+        function updateCards(drawnCards) {
+            const cardsElement = document.getElementById('cards');
+            cardsElement.innerText = `Drawn Cards: ${drawnCards.join(", ")}`;
+        }
+    </script>
+</body>
+</html>
